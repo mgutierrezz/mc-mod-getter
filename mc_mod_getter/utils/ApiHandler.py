@@ -6,13 +6,12 @@ import requests
 import logging
 
 class ApiHandler:
-    def __init__(self,host,version,loader,mod_dir,verbose):
+    def __init__(self, host, version, loader, mod_dir):
         self.host = host
         self.version = str(version)
         self.loader = loader
         self.__set_api_host()
         self.mod_dir = mod_dir
-        self.verbose = verbose
         logging.info(f'API Handler details: {self}')
 
     def __repr__(self) -> str:
