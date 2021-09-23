@@ -15,6 +15,7 @@ class ApiHandler:
         self.mod_dir = mod_dir
         logging.info(f'API Handler details: {self}')
 
+
     def __repr__(self) -> str:
         return str(self.__dict__)
 

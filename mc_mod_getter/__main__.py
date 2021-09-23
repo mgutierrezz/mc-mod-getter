@@ -38,5 +38,3 @@ def main(file,verbose):
 
 if __name__ == '__main__':
     main()
-
-    
