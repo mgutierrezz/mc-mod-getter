@@ -9,7 +9,6 @@ __author_email__ = version_info.__author_email__
 __title__ = version_info.__title__
 __description__ = version_info.__description__
 __url__ = version_info.__url__
-# __build__ = version_info.__build__
 __license__ = version_info.__license__
 __copyright__ = version_info.__copyright__
 __keywords__ = version_info.__keywords__

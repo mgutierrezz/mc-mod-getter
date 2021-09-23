@@ -50,6 +50,7 @@ class ApiHandler:
             except:
                 if not mod:
                     logging.info(f'{mod_name} not found, check on {self.host} if it exists or mod name spelling')
+                break
             else:
                 break
 
