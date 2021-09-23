@@ -1,15 +1,16 @@
 #!/usr/bin/env python3
 
 import os
+import logging
 import hashlib
 import requests
-import logging
+from pathlib import Path
 
 class ApiHandler:
     def __init__(self, host, version, loader, mod_dir):
-        self.host = host
+        self.host = str(host).lower()
         self.version = str(version)
-        self.loader = loader
+        self.loader = str(loader).lower()
         self.__set_api_host()
         self.mod_dir = mod_dir
         logging.info(f'API Handler details: {self}')
@@ -36,7 +37,11 @@ class ApiHandler:
         filename = mod['files'][0]['filename']
         jar_file = os.path.join(self.mod_dir, filename)
 
-        logging.info(f'From:{self.host} Downloading:{mod_name}({mod_id}) File:{filename}')
+        logging.info(f'From:{self.host} Mod:{mod_name} ({mod_id}) File:{filename}')
+
+        if Path(jar_file).is_file():
+            logging.info(f'Skipping Download... Already downloaded')
+
 
         # Download the mod, if the file hashes dont match, redownload the mod and check again
         while True:
@@ -73,11 +78,11 @@ class ApiHandler:
         return versions[0] if versions else None
 
 
-    def __file_checksum(self, file_path, url_hash) -> bool:
+    def __file_checksum(self, file_path, host_hash) -> bool:
 
         with open(file_path, 'rb') as f:
             file_hash = hashlib.sha512()
             while chunk := f.read(8192):
                 file_hash.update(chunk)
 
-        return file_hash.hexdigest() == url_hash
+        return file_hash.hexdigest() == host_hash
