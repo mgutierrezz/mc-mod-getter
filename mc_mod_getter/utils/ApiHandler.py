@@ -41,7 +41,7 @@ class ApiHandler:
 
         if Path(jar_file).is_file():
             logging.info(f'Skipping Download... Already downloaded')
-
+            return
 
         # Download the mod, if the file hashes dont match, redownload the mod and check again
         while True:
