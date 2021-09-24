@@ -4,7 +4,7 @@ Utility to download Minecraft mods from the internet
 
 ## Usage
 
-I made this tool to download & update mods using [MultiMC](https://github.com/MultiMC/MultiMC5) but you can use this as a standalone cli tool as well.
+I made this tool to download & update mods using [MultiMC](https://github.com/MultiMC/MultiMC5) but you can use this as a standalone cli tool as well
 
 ### MultiMC
 
@@ -18,7 +18,7 @@ I made this tool to download & update mods using [MultiMC](https://github.com/Mu
 
 4. Copy the binary to your MultiMC's instance .minecraft folder
 
-5. Create a YAML file in the same .minecraft directory
+5. Create a [yaml file](#yaml-file-structure) in the same .minecraft directory
 
 6. Enable Custom Commands under in your instance's Settings & paste the following in the Pre-launch command box
 
@@ -28,9 +28,7 @@ I made this tool to download & update mods using [MultiMC](https://github.com/Mu
 
 7. Launch your instance
 
-
-
-### CLI 
+### CLI
 
 Install it from PyPi to an env:
 
@@ -46,7 +44,10 @@ python -m mc-mod-getter --file /path/to/file.yaml -v
 
 
 
-1. 
+## YAML File Structure
+
+The tool takes a yaml file as input (Tabs for indentations, space after hyphens)
+Here's an example yaml file:
 
 ```yaml
 modrinth:
@@ -62,11 +63,6 @@ modrinth:
         - Hydrogen
 ```
 
-**Note**: 
+*Note:*
 
-
-
-
-
-
-
+- ​	*For now, there is only support for [Modrinth](https://modrinth.com/mods?q=) so search for your mods on there. Will add other platforms eventually*
