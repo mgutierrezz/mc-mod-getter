@@ -2,7 +2,6 @@
 
 from mc_mod_getter import __project_urls__
 from mc_mod_getter.utils.ApiHandler import ApiHandler
-from pathlib import Path
 import logging
 import click
 import yaml
@@ -24,9 +23,6 @@ def main(file,verbose):
     
     for host, mod_info in mods_dict:
         mod_list = mod_info.pop('mods')
-
-        if not mod_info.get('mod_dir',None):
-            mod_info['mod_dir'] = str(Path.home() / 'Downloads')
 
         logging.info(f'Downloading mods to: {mod_info["mod_dir"]}')
 

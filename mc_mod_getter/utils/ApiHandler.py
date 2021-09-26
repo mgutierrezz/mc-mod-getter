@@ -1,10 +1,13 @@
 #!/usr/bin/env python3
-
-import os
+from __future__ import annotations
+from pathlib import Path
+from typing import Union
+import requests as req
 import logging
 import hashlib
-import requests as req
-from pathlib import Path
+import os
+
+
 
 class ApiHandler:
     class NoAccess(Exception): pass
@@ -12,15 +15,14 @@ class ApiHandler:
 
     _api_handler_hosts = {}
 
-
-    def __init_subclass__(cls, **kwargs):
+    def __init_subclass__(cls, **kwargs: str) -> None:
         """Registers the the different ApiHandler subclasses to be used for __new__ """
         super().__init_subclass__(**kwargs)
         cls._api_handler_hosts[cls.host] = cls
 
         
-    def __new__(cls, host, **kwargs):
-        """Creates the correct ApiHandler class given the host arg """
+    def __new__(cls, host: str, **kwargs: str) -> Union[ModrinthApiHandler, CurseforgeApiHandler, Unknown]:
+        """Creates the correct ApiHandler subclass given the host arg """
         api_handler_host = cls._api_handler_hosts.get(host, None)
         
         if api_handler_host:
@@ -30,18 +32,18 @@ class ApiHandler:
             raise cls.Unknown(f'Mod host: {host} is not supported')
 
 
-    def __init__(self,host,version,loader,mod_dir):
-        self.version = str(version)
-        self.loader = str(loader).lower()
-        self.mod_dir = mod_dir
+    def __init__(self, *args: str, **kwargs: str) -> None:
+        self.version = kwargs.pop('version')
+        self.loader = kwargs.pop('loader').lower()
+        self.mod_dir = kwargs.pop('mod_dir', str(Path.home() / 'Downloads'))
 
 
     def __repr__(self) -> str:
         return str(self.__dict__)
 
 
-    @classmethod
-    def __file_checksum(self, file_path, host_hash) -> bool:
+    @staticmethod
+    def __file_checksum(file_path: str, host_hash: str) -> bool:
 
         with open(file_path, 'rb') as f:
             file_hash = hashlib.sha512()
@@ -55,8 +57,8 @@ class ModrinthApiHandler(ApiHandler):
     host = 'modrinth'
     host_api = 'https://api.modrinth.com/api/v1/mod'
 
-    def __init__(self, host, version, loader, mod_dir):
-        super().__init__(host, version, loader, mod_dir)
+    def __init__(self, *args: str, **kwargs: str) -> None:
+        super().__init__(*args, **kwargs)
 
 
     def __repr__(self) -> str:
@@ -71,7 +73,7 @@ class ModrinthApiHandler(ApiHandler):
                 return mod['mod_id'].split('-')[1]
 
 
-    def __filter_mod_version(self, mod_id: str):
+    def __filter_mod_version(self, mod_id: str) -> dict:
         # Send the id, and get back all version available for the mod
         versions_request = f'{self.host_api}/{mod_id}/version'
         mod_versions = req.request('GET', versions_request).json()
@@ -83,7 +85,7 @@ class ModrinthApiHandler(ApiHandler):
         return mod_versions[0] if mod_versions else None
 
 
-    def download_mod(self, mod_name: str):
+    def download_mod(self, mod_name: str) -> None:
         mod_id = self.__get_mod_id(mod_name)
         mod = self.__filter_mod_version(mod_id)
         mod_file = mod['files'][0]
@@ -109,3 +111,8 @@ class ModrinthApiHandler(ApiHandler):
                 break
             else:
                 break
+
+
+class CurseforgeApiHandler(ApiHandler):
+    host = 'curseforge'
+    host_api = 'https://addons-ecs.forgesvc.net/api/v2/addon/search?gameId=432&sectionId=6'
