@@ -30,7 +30,8 @@ def main(file,verbose):
 
         logging.info(f'Downloading mods to: {mod_info["mod_dir"]}')
 
-        api_handler = ApiHandler(host, **mod_info)
+        api_handler = ApiHandler(host,**mod_info)
+        logging.info(api_handler)
 
         for mod in mod_list:
             api_handler.download_mod(mod)
