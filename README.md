@@ -1,16 +1,14 @@
 # mc-mod-getter [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) [![Package Pypi](https://img.shields.io/pypi/v/mc-mod-getter.svg)](https://pypi.org/project/mc-mod-getter)
 
-Utility to download Minecraft mods from the internet
+I made this tool to download & update mods using [MultiMC](https://github.com/MultiMC/MultiMC5) but you can use this as a standalone python module as well
 
 ## Usage
-
-I made this tool to download & update mods using [MultiMC](https://github.com/MultiMC/MultiMC5) but you can use this as a standalone python module as well
 
 ### MultiMC
 
 1. Create or Edit a minecraft instance 
 
-   ***NOTE**: Ensure there are no spaces in the name*
+   ***NOTE**: Ensure there are no spaces in the instance name or the directory paths*
 
 2. Install your loader of choice
 
@@ -28,7 +26,7 @@ I made this tool to download & update mods using [MultiMC](https://github.com/Mu
 
 7. Launch your instance
 
-### OR
+### Python
 
 Install it from PyPi to an env:
 
