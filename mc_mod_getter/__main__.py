@@ -19,11 +19,11 @@ def main(file,verbose):
 
     logging.info(f'Using yaml file: {mods_yaml}')
 
-    mods_dict = yaml.safe_load(open(mods_yaml, 'r')).items()
+    yaml_info = dict(yaml.safe_load(open(mods_yaml, 'r')).items())
+    hosts = yaml_info.pop('mods')
 
-    for host, mod_info in mods_dict:
-        mod_list = mod_info.pop('mods')
-        api_handler = ApiHandler(host.lower(),**mod_info)
+    for host, mod_list in hosts.items():
+        api_handler = ApiHandler(host.lower(),**yaml_info)
 
         for mod in mod_list:
             api_handler.download_mod(mod)
