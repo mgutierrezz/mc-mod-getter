@@ -20,6 +20,16 @@ I made this tool to download & update mods using [MultiMC](https://github.com/Mu
 
 6. Enable Custom Commands under in your instance's Settings & paste the following in the Pre-launch command box
 
+   MacOS
+
+   ```bash
+   $INST_MC_DIR/mc-mod-getter --file $INST_MC_DIR/<FILENAME>.yaml
+   ```
+
+   
+
+   Windows:
+
    ```bash
    $INST_MC_DIR/mc-mod-getter.exe --file $INST_MC_DIR/<FILENAME>.yaml
    ```
