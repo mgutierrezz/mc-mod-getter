@@ -5,9 +5,7 @@ from typing import Union
 import requests as req
 import logging
 import hashlib
-import types
-import os,sys,json
-
+import os
 
 
 class ApiHandler:
@@ -76,6 +74,10 @@ class ApiHandler:
     
     def download_mod(self, mod_name: str) -> None:
         mod_id = self._get_mod_id(mod_name)
+
+        if not mod_id:
+            return
+
         mod = self._filter_mod_version(mod_id)
         mod_file_path = os.path.join(self.mod_dir, mod['filename'])
 
@@ -87,20 +89,14 @@ class ApiHandler:
 
         # Download the mod, if the file hashes dont match, redownload the mod and check again
         while True:
-            try:             
-                logging.info(f'Downloading mods to: {self.mod_dir}')
-                with open(mod_file_path, 'wb') as f:
-                    f.write(req.get(mod['url'], stream=True).content)  
-                if not self._file_checksum(mod_file_path, mod['hashes']):
-                    continue
-            except Exception as e:
-                logging.info(e)
-                if not mod:
-                    logging.info(f'{mod_name} not found, check on {self._host} if it exists or mod name spelling')
-                break
-            else:
-                break
+            logging.info(f'Downloading {self._host} mods to: {self.mod_dir}')
 
+            with open(mod_file_path, 'wb') as f:
+                f.write(req.get(mod['url'], stream=True).content)  
+
+            if self._file_checksum(mod_file_path, mod['hashes']):
+                break
+            
 
 class ModrinthApiHandler(ApiHandler):
     _host = 'modrinth'
@@ -116,10 +112,13 @@ class ModrinthApiHandler(ApiHandler):
 
     def _get_mod_id(self, mod_name: str) -> str:
         search_query =  f'{self._host_api}?query={mod_name.lower()}'
-        
+
         for mod in req.request('GET', search_query).json()['hits']:
             if mod_name in mod['title'] and self.loader in mod['categories']:
                 return mod['mod_id'].split('-')[1]
+        else:
+            logging.info(f'Skipping mod:{mod_name}, check on {self._host} if it exists or mod name spelling')
+            return None
 
 
     def _filter_mod_version(self, mod_id: str) -> dict:
@@ -130,7 +129,7 @@ class ModrinthApiHandler(ApiHandler):
         # Get all versions that match the mc version found in yaml file
         mod_versions = [v for v in mod_versions if self.version == v['game_versions'][-1]]
         
-        # Return first mod in mod_versions, it's the latest mod version matching mc version in yaml
+        # Return first mod in mod_versions, it's the latest matching mc version in yaml
         mod = mod_versions[0]['files'][0] if mod_versions else None
 
         mod['hashes'] = mod['hashes']['sha512']
@@ -152,6 +151,7 @@ class CurseforgeApiHandler(ApiHandler):
     )
     _headers = {'User-Agent': _user_agent}
 
+    
     def __init__(self, *args: str, **kwargs: str) -> None:
         super().__init__(*args, **kwargs)
 
@@ -172,6 +172,9 @@ class CurseforgeApiHandler(ApiHandler):
         for mod in req.get(search_query,headers=self._headers).json():          
             if mod_name == mod['name'] and self.loader in str(mod['modLoaders']).lower():
                 return mod['id']
+        else:
+            logging.info(f'Skipping mod:{mod_name}, check on {self._host} if it exists or mod name spelling')
+            return None
 
 
     def _filter_mod_version(self, mod_id: str) -> dict:
@@ -186,13 +189,14 @@ class CurseforgeApiHandler(ApiHandler):
             mod_versions = req.get(search_query,headers=self._headers).json()
         
         else:
+            # {curseapi key : renamed key}
             mod_details = {
-                # {curseapi name : renamed}
                 'fileName':'filename',
                 'downloadUrl': 'url',
                 'hashes': 'hashes'
             }
 
+            # Modify keys to to make download method generic
             mod = {mod_details[key]: value for key, value in mod_versions[0].items() if key in mod_details}
             mod['hashes'] = [h['value'] for h in mod['hashes']]
 
