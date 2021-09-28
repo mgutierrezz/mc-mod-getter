@@ -22,7 +22,9 @@ def main(file,verbose):
     yaml_info = dict(yaml.safe_load(open(mods_yaml, 'r')).items())
     hosts = yaml_info.pop('mods')
 
+    logging.info(f'Downloading mods to: {yaml_info["mod_dir"]}')
     for host, mod_list in hosts.items():
+        logging.info(f'Downloading Mods from: {host}')
         api_handler = ApiHandler(host.lower(),**yaml_info)
 
         for mod in mod_list:

@@ -81,16 +81,14 @@ class ApiHandler:
         mod = self._filter_mod_version(mod_id)
         mod_file_path = os.path.join(self.mod_dir, mod['filename'])
 
-        logging.info(f'Downloading Mod: {mod_name}({mod_id}) From: {self._host} File: {mod["filename"]}')
+        logging.info(f'> {mod_name} ({mod_id})  File:{mod["filename"]}')
 
         if Path(mod_file_path).is_file():
-            logging.info(f'Skipping Download... Already downloaded')
+            logging.info(f'> Skipping...already downloaded')
             return
 
         # Download the mod, if the file hashes dont match, redownload the mod and check again
         while True:
-            logging.info(f'Downloading {self._host} mods to: {self.mod_dir}')
-
             with open(mod_file_path, 'wb') as f:
                 f.write(req.get(mod['url'], stream=True).content)  
 
@@ -117,7 +115,7 @@ class ModrinthApiHandler(ApiHandler):
             if mod_name in mod['title'] and self.loader in mod['categories']:
                 return mod['mod_id'].split('-')[1]
         else:
-            logging.info(f'Skipping mod:{mod_name}, check on {self._host} if it exists or mod name spelling')
+            logging.info(f'> Skipping {mod_name}, check {self._host} if it exists or mod name spelling')
             return None
 
 
@@ -173,7 +171,7 @@ class CurseforgeApiHandler(ApiHandler):
             if mod_name == mod['name'] and self.loader in str(mod['modLoaders']).lower():
                 return mod['id']
         else:
-            logging.info(f'Skipping mod:{mod_name}, check on {self._host} if it exists or mod name spelling')
+            logging.info(f'> Skipping {mod_name}, check on {self._host} if it exists or mod name spelling')
             return None
 
 

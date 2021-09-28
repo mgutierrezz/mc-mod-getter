@@ -4,7 +4,7 @@ Utility to download Minecraft mods from the internet
 
 ## Usage
 
-I made this tool to download & update mods using [MultiMC](https://github.com/MultiMC/MultiMC5) but you can use this as a standalone cli tool as well
+I made this tool to download & update mods using [MultiMC](https://github.com/MultiMC/MultiMC5) but you can use this as a standalone python module as well
 
 ### MultiMC
 
@@ -14,7 +14,7 @@ I made this tool to download & update mods using [MultiMC](https://github.com/Mu
 
 2. Install your loader of choice
 
-3. Download the binary from releases or build your own binary from scratch
+3. Download the binary from releases or [build your own binary](#building-your-own-binary) from scratch
 
 4. Copy the binary to your MultiMC's instance .minecraft folder
 
@@ -28,7 +28,7 @@ I made this tool to download & update mods using [MultiMC](https://github.com/Mu
 
 7. Launch your instance
 
-### CLI
+### OR
 
 Install it from PyPi to an env:
 
@@ -39,7 +39,7 @@ python -m pip install mc-mod-getter
 Run the tool:
 
 ```bash
-python -m mc-mod-getter --file /path/to/file.yaml -v
+python -m mc-mod-getter --file /path/to/file.yaml
 ```
 
 
@@ -50,19 +50,45 @@ The tool takes a yaml file as input (Tabs for indentations, space after hyphens)
 Here's an example yaml file:
 
 ```yaml
-modrinth:
-    version: 1.17.1
-    loader: fabric
-    mod_dir: C:\Games\mmc-stable-win32\MultiMC\instances\test-mc-1.17.1\.minecraft\mods
-    mods:
+loader: fabric
+version: 1.17.1
+mod_dir: C:\Users\gute\Downloads\test
+mods:
+    curseforge:
+        - Cloth Config API (Fabric)
+    modrinth:
         - Fabric API
         - FallingTree
         - EasierVillagerTrading
         - Mod Menu
         - Starlight
         - Hydrogen
+        - Sodium
+        - Lithium
+        - Indium
+        - DashLoader
+        - Enhanced Block Entities
+        - Seamless Loading Screen
+        - Falling Leaves
 ```
 
-*Note:*
+### Supported Mod Hosts:
 
-- ​	*For now, there is only support for [Modrinth](https://modrinth.com/mods?q=) so search for your mods on there. Will add other platforms eventually*
+> [Modrinth](https://modrinth.com/mods?q=)
+
+> [Curseforge](https://www.curseforge.com/minecraft/mc-mods)
+
+## Building Your Own Binary
+
+Activate an env and navigate to the root project directory
+
+```bash
+make build
+```
+
+or if you don't have make
+
+```bash
+python3 -m pip install pyinstaller 
+python3 -m PyInstaller --onefile mc_mod_getter/__main__.py
+```
