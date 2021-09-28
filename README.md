@@ -23,7 +23,7 @@ I made this tool to download & update mods using [MultiMC](https://github.com/Mu
 6. Enable Custom Commands under in your instance's Settings & paste the following in the Pre-launch command box
 
    ```bash
-   $INST_MC_DIR/mc-mod-getter.exe --file $INST_MC_DIR/<FILENAME>.yaml -v
+   $INST_MC_DIR/mc-mod-getter.exe --file $INST_MC_DIR/<FILENAME>.yaml
    ```
 
 7. Launch your instance
@@ -33,13 +33,13 @@ I made this tool to download & update mods using [MultiMC](https://github.com/Mu
 Install it from PyPi to an env:
 
 ```bash
-python -m pip install mc-mod-getter
+python3 -m pip install mc-mod-getter
 ```
 
 Run the tool:
 
 ```bash
-python -m mc-mod-getter --file /path/to/file.yaml
+python3 -m mc-mod-getter --file /path/to/file.yaml
 ```
 
 
@@ -52,7 +52,7 @@ Here's an example yaml file:
 ```yaml
 loader: fabric
 version: 1.17.1
-mod_dir: C:\Users\gute\Downloads\test
+mod_dir: C:\Games\mmc-stable-win32\MultiMC\instances\fabric-1.17.1\.minecraft\mods
 mods:
     curseforge:
         - Cloth Config API (Fabric)
