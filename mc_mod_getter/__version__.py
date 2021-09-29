@@ -3,7 +3,7 @@
 """Information about this version release
 """
 
-__version__ = '1.0.1'
+__version__ = '1.1.0'
 __title__ = 'mc-mod-getter'
 __description__ = 'Easy Download & Update Mods for Minecraft'
 __user__ = 'mgutierrezz'
