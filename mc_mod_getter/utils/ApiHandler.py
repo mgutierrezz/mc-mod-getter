@@ -35,12 +35,13 @@ class ApiHandler:
         self.version = kwargs.pop('version')
         self.loader = kwargs.pop('loader').lower()
         self.mod_dir = kwargs.pop('mod_dir', str(Path.home() / 'Downloads'))
+        self.downloaded = self._get_downloaded_mods()
 
 
     def __repr__(self) -> str:
         return str(self.__dict__)
 
-    
+
     @classmethod
     def _file_checksum(cls, file_path: str, host_hash: Union[list,str]) -> bool:
         hash_algorithms = {    
@@ -64,6 +65,21 @@ class ApiHandler:
         return any([file_hash.hexdigest() == h for h in host_hash])
 
 
+    @staticmethod
+    def _strip_non_alpha(string: str):
+        return ''.join([char for char in string if char.isalpha()])
+    
+    
+    def _get_downloaded_mods(self):
+        files = [p.name for p in Path(self.mod_dir).rglob('*.jar')]
+        downloaded = {}
+
+        for f in files:
+            downloaded[self._strip_non_alpha(f)] = f
+        
+        return downloaded
+        
+
     def _get_mod_id(self) -> None:
         raise NotImplementedError
            
@@ -80,12 +96,19 @@ class ApiHandler:
 
         mod = self._filter_mod_version(mod_id)
         mod_file_path = os.path.join(self.mod_dir, mod['filename'])
+        old_version = self.downloaded.get(self._strip_non_alpha(mod['filename']), None)
 
-        logging.info(f'> {mod_name} ({mod_id})  File:{mod["filename"]}')
-
+        # Already have latest version
         if Path(mod_file_path).is_file():
-            logging.info(f'> Skipping...already downloaded')
+            logging.info(f'> Skipping {mod_name}...already latest')
             return
+
+        # If theres an update, delete the older mod version
+        elif old_version:
+            logging.info(f'> Updating {mod_name} & removing old version: {old_version}')
+            Path(os.path.join(self.mod_dir, old_version)).unlink()
+
+        logging.info(f'> {mod_name} ({mod_id})  File: {mod["filename"]}')
 
         # Download the mod, if the file hashes dont match, redownload the mod and check again
         while True:
