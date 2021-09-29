@@ -12,7 +12,7 @@ I made this tool to download & update mods using [MultiMC](https://github.com/Mu
 
 2. Install your loader of choice
 
-3. Download the binary from releases or [build your own binary](#building-your-own-binary) from scratch
+3. Download the binary from [releases](https://github.com/mgutierrezz/mc-mod-getter/releases) or [build your own binary](#building-your-own-binary) from scratch
 
 4. Copy the binary to your MultiMC's instance .minecraft folder
 
