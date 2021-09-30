@@ -51,7 +51,7 @@ class ApiHandler:
 
         # Handle Curseforge api's 0 or many provided hashes
         if not host_hash:
-            logging.info(f'WARNING: Cannot verify {file_path} was downloaded correctly')
+            logging.info(f'  > [WARNING] : Cannot verify {file_path} was downloaded correctly')
             return True
 
         host_hash = [host_hash] if type(host_hash) is str else host_hash
@@ -60,7 +60,6 @@ class ApiHandler:
             file_hash = hashlib.new(hash_algorithms[cls._host])
             while chunk := f.read(8192):
                 file_hash.update(chunk)
-
 
         return any([file_hash.hexdigest() == h for h in host_hash])
 
@@ -100,15 +99,15 @@ class ApiHandler:
 
         # Already have latest version
         if Path(mod_file_path).is_file():
-            logging.info(f'> Skipping {mod_name}...already latest')
+            logging.info(f'  > Skipping {mod_name}...already latest')
             return
 
         # If theres an update, delete the older mod version
         elif old_version:
-            logging.info(f'> Updating {mod_name} & removing old version: {old_version}')
+            logging.info(f'  > Updating {mod_name} & removing old version: {old_version}')
             Path(os.path.join(self.mod_dir, old_version)).unlink()
 
-        logging.info(f'> {mod_name} ({mod_id})  File: {mod["filename"]}')
+        logging.info(f'  > {mod_name} ({mod_id})  File: {mod["filename"]}')
 
         # Download the mod, if the file hashes dont match, redownload the mod and check again
         while True:
@@ -132,13 +131,24 @@ class ModrinthApiHandler(ApiHandler):
 
 
     def _get_mod_id(self, mod_name: str) -> str:
+        last_seen = None
         search_query =  f'{self._host_api}?query={mod_name.lower()}'
 
-        for mod in req.request('GET', search_query).json()['hits']:
+        for mod in req.get(search_query).json()['hits']:
+            last_seen = mod
             if mod_name in mod['title'] and self.loader in mod['categories']:
                 return mod['mod_id'].split('-')[1]
+
         else:
-            logging.info(f'> Skipping {mod_name}, check {self._host} if it exists or mod name spelling')
+            error = f'  > [WARNING] Skipping {mod_name}, '
+
+            if not last_seen or mod_name != last_seen['title']:
+                error += f'check if mod exists on {self._host} or mod name spelling'
+
+            elif self.loader in str(mod['categories']).lower():
+                error += f'No {self.loader} version found, only {",".join(last_seen["modLoaders"])}'
+
+            logging.info(error)
             return None
 
 
@@ -184,17 +194,30 @@ class CurseforgeApiHandler(ApiHandler):
     def _get_mod_id(self, mod_name: str) -> str:
         # Search only 1 word from mod name b/c api is dumb and uses OR conditions for each word
         mod_query_name = mod_name.lower().split(' ')[0]
+        mod_query_name = self._strip_non_alpha(mod_query_name)
+        last_seen = None
         search_query =  (
             f'{self._host_api}/search?gameId=432&sectionId=6'
             f'&searchFilter={mod_query_name}'
             f'&gameVersion={self.version}'
         )
-        
-        for mod in req.get(search_query,headers=self._headers).json():          
+
+        for mod in req.get(search_query,headers=self._headers).json():    
+            last_seen = mod
+
             if mod_name == mod['name'] and self.loader in str(mod['modLoaders']).lower():
                 return mod['id']
+
         else:
-            logging.info(f'> Skipping {mod_name}, check on {self._host} if it exists or mod name spelling')
+            error = f'  > [WARNING] Skipping {mod_name}, '
+
+            if not last_seen or mod_name != last_seen['name']:
+                error += f'check if mod exists on {self._host} or mod name spelling'
+
+            elif self.loader in str(mod['modLoaders']).lower():
+                error += f'No {self.loader} version found, only {",".join(last_seen["modLoaders"])}'
+                logging.info(error)
+            
             return None
 
 
