@@ -66,7 +66,7 @@ class ApiHandler:
 
     @staticmethod
     def _strip_non_alpha(string: str):
-        return ''.join([char for char in string if char.isalpha()])
+        return ''.join([char for char in string if char.isalpha() or char == "'"])
     
     
     def _get_downloaded_mods(self):
@@ -201,8 +201,12 @@ class CurseforgeApiHandler(ApiHandler):
             f'&gameVersion={self.version}'
         )
 
-        for mod in req.get(search_query,headers=self._headers).json():    
+        for mod in req.get(search_query,headers=self._headers).json():
             last_seen = mod
+
+            # Yet another curse issue, assume if no loader is specified for mod, its universal
+            if not mod.get('modLoaders'):
+                mod['modLoaders'] = self.loader
 
             if mod_name == mod['name'] and self.loader in str(mod['modLoaders']).lower():
                 return mod['id']
