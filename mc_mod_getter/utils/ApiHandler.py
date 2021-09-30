@@ -140,15 +140,15 @@ class ModrinthApiHandler(ApiHandler):
                 return mod['mod_id'].split('-')[1]
 
         else:
-            error = f'  > [WARNING] Skipping {mod_name}, '
+            warning = f'  > [WARNING] Skipping {mod_name}, '
 
             if not last_seen or mod_name != last_seen['title']:
-                error += f'check if mod exists on {self._host} or mod name spelling'
+                warning += f'check if mod exists on {self._host} or mod name spelling'
 
             elif self.loader in str(mod['categories']).lower():
-                error += f'No {self.loader} version found, only {",".join(last_seen["modLoaders"])}'
+                warning += f'No {self.loader} version found, only {",".join(last_seen["modLoaders"])}'
 
-            logging.info(error)
+            logging.info(warning)
             return None
 
 
@@ -182,7 +182,6 @@ class CurseforgeApiHandler(ApiHandler):
     )
     _headers = {'User-Agent': _user_agent}
 
-    
     def __init__(self, *args: str, **kwargs: str) -> None:
         super().__init__(*args, **kwargs)
 
@@ -209,14 +208,14 @@ class CurseforgeApiHandler(ApiHandler):
                 return mod['id']
 
         else:
-            error = f'  > [WARNING] Skipping {mod_name}, '
+            warning = f'  > [WARNING] Skipping {mod_name}, '
 
             if not last_seen or mod_name != last_seen['name']:
-                error += f'check if mod exists on {self._host} or mod name spelling'
+                warning += f'check if mod exists on {self._host} or mod name spelling'
 
             elif self.loader in str(mod['modLoaders']).lower():
-                error += f'No {self.loader} version found, only {",".join(last_seen["modLoaders"])}'
-                logging.info(error)
+                warning += f'No {self.loader} version found, only {",".join(last_seen["modLoaders"])}'
+                logging.info(warning)
             
             return None
 
