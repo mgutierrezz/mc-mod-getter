@@ -32,7 +32,7 @@ class ApiHandler:
 
 
     def __init__(self, *args: str, **kwargs: str) -> None:
-        self.version = kwargs.pop('version')
+        self.version = str(kwargs.pop('version'))
         self.loader = kwargs.pop('loader').lower()
         self.mod_dir = kwargs.pop('mod_dir', str(Path.home() / 'Downloads'))
         self.downloaded = self._get_downloaded_mods()
@@ -88,12 +88,17 @@ class ApiHandler:
 
     
     def download_mod(self, mod_name: str) -> None:
+        logging.info(f'Downloading mod {mod_name}')
         mod_id = self._get_mod_id(mod_name)
 
         if not mod_id:
             return
 
         mod = self._filter_mod_version(mod_id)
+        if not mod:
+            logging.info(f'  > [WARNING] : Mod not found for version. skipping...')
+            return
+
         mod_file_path = os.path.join(self.mod_dir, mod['filename'])
         old_version = self.downloaded.get(self._strip_non_alpha(mod['filename']), None)
 
@@ -225,10 +230,12 @@ class CurseforgeApiHandler(ApiHandler):
 
 
     def _filter_mod_version(self, mod_id: str) -> dict:
+        logging.info(f'  > [INFO] : Filtering mod versions {self.version}/{self.loader.capitalize()} for mod {mod_id}')
         try:
             search_query = f'{self._host_api}/{mod_id}'
+            logging.info(f'  > [INFO] : Requesting mod version: {search_query}')
             mod_versions = req.get(search_query,headers=self._headers).json()['latestFiles']
-            mod_versions = [v for v in mod_versions if self.version in v['gameVersion'] and self.loader.capitalize() in v['gameVersion']]
+            mod_versions = [v for v in mod_versions if any(self.version in x for x in v['gameVersion']) and self.loader.capitalize() in v['gameVersion']]
 
         except:
             # TODO: If searching on curseforge version not in Latest files
@@ -236,6 +243,12 @@ class CurseforgeApiHandler(ApiHandler):
             mod_versions = req.get(search_query,headers=self._headers).json()
         
         else:
+            # Version not found. Skipping.
+            if not mod_versions:
+                return
+
+            logging.info(f'  > [INFO] : Found mod for version')
+
             # {curseapi key : renamed key}
             mod_details = {
                 'fileName':'filename',
